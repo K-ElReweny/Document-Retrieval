@@ -1,4 +1,6 @@
 
+import math
+
 class Retrieve:
     
     # Create new Retrieve object storing index and term weighting 
@@ -18,34 +20,53 @@ class Retrieve:
     # represented as a list of preprocessed terms). Returns list 
     # of doc ids for relevant docs (in rank order).
     def for_query(self, query):
-        if self.term_weighting == 'binary':
-          return self.binary_term_weight(query)
-        elif self.term_weighting == 'tf':
-          return self.term_frequency_weight(query)
-        elif self.term_weighting == 'tfidf':
-          return self.tfidf_weight(query)
+      self.get_inverse_document_frequency()
+      return list(range(1,11))
+        # if self.term_weighting == 'binary':
+        #   return self.binary_term_weight(query)
+        # elif self.term_weighting == 'tf':
+        #   return self.term_frequency_weight(query)
+        # elif self.term_weighting == 'tfidf':
+        #   return self.tfidf_weight(query)
           
-        #return list(range(1,11))
-
-    # A method to precompute the inverse document frequency value of each term in the
-    # collection, again based just on the inverted index. Thus, the index maps each term to
-    # the documents that contain it, whose number determines its document frequency.
-
-    def method1(self): 
-      pass
-
-    # A method to precompute the document vector size for each document in the collection
-    # Note that this can be computed for all documents at the same time, in a single pass over
-    # the index. Where TF.IDF term weighting is used, the IDF values must be computed before
-    # the document vector sizes are calculated.
-
-    def method2(self): 
-      pass
+      # return self.get_candidate_document_ids(query)
 
 
-    # A method that calculates weights using the Binary weight scheme ( whether or not a term is present)
-    def binary_term_weight(self, query):
-      pass
+    # This Function returns the idf (Inverse Document Frequency) value for each term in inverted index
+
+    def get_inverse_document_frequency(self):
+      index = self.index
+      total_docs = self.num_docs
+      document_frequency = dict() # maps a term to integer(document number)
+      inverse_document_frequency = dict() # maps a term to inverse document frequency
+
+      # Calculates Document Frequency value for each term
+      for term in index:
+        df = len(index[term]) # calculates document frequency
+        document_frequency.update({ term: df })
+
+      #Calculates Inverse Document Frequency value for each term
+      for term in index:
+        idf = math.log(total_docs/document_frequency[term], 10)
+        inverse_document_frequency.update({ term: idf })
+
+      return inverse_document_frequency
+
+      
+
+    # gets all candidate document ids ( documents with at least one term from the query)
+    # def get_candidate_document_ids(self, query):
+    #   # print(query)
+    #   documents = self.index
+    #   candidate_document_ids = []
+    #   for query_term in query:
+    #     for term in documents:
+    #       if query_term == term:
+    #         document_ids = list(documents[term].keys())
+    #         candidate_document_ids.extend(document_ids)
+    #   candidate_document_ids = list(dict.fromkeys(candidate_document_ids)) #removes duplicates
+    #   return candidate_document_ids
+
 
     def term_frequency_weight(self, query):
       pass
